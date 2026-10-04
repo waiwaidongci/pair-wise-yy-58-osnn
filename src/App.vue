@@ -3,10 +3,13 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import * as THREE from 'three';
 import { useLiftStore } from './store';
+import { useScheduleStore } from './scheduleStore';
+import ScheduleLedger from './ScheduleLedger.vue';
 
 const route = useRoute();
 const router = useRouter();
 const store = useLiftStore();
+const scheduleStore = useScheduleStore();
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const commentText = ref('');
 const sceneContainer = ref<HTMLElement | null>(null);
@@ -21,6 +24,7 @@ let previousX = 0;
 const nav = [
   { path: '/', label: '三维复核', icon: 'view_in_ar' },
   { path: '/models', label: '模型与参数', icon: 'tune' },
+  { path: '/schedule', label: '排程账', icon: 'event_note' },
   { path: '/checks', label: '冲突与评论', icon: 'rule' },
   { path: '/review', label: '多角色会签', icon: 'fact_check' }
 ];
@@ -199,6 +203,9 @@ onBeforeUnmount(() => {
         >
           <q-item-section avatar><q-icon :name="item.icon" /></q-item-section>
           <q-item-section>{{ item.label }}</q-item-section>
+          <q-item-section v-if="item.path === '/schedule' && scheduleStore.conflicts.length" side>
+            <q-badge color="negative">{{ scheduleStore.conflicts.length }}</q-badge>
+          </q-item-section>
           <q-item-section v-if="item.path === '/checks'" side>
             <q-badge color="negative">{{ store.conflicts.length }}</q-badge>
           </q-item-section>
@@ -299,6 +306,10 @@ onBeforeUnmount(() => {
             <q-input v-model="store.selectedStep.note" type="textarea" autogrow outlined label="现场控制说明" class="note-input" />
             <q-btn class="save-step" color="primary" no-caps icon="save" label="保存步骤修改" @click="store.updateStep({})" />
           </aside>
+        </section>
+
+        <section v-if="route.path === '/schedule'">
+          <ScheduleLedger />
         </section>
 
         <section v-if="route.path === '/checks'" class="content-panel full-panel">
