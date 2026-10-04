@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import * as THREE from 'three';
 import { useLiftStore } from './store';
+import ScheduleView from './schedule/ScheduleView.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -21,6 +22,7 @@ let previousX = 0;
 const nav = [
   { path: '/', label: '三维复核', icon: 'view_in_ar' },
   { path: '/models', label: '模型与参数', icon: 'tune' },
+  { path: '/schedule', label: '排程账', icon: 'calendar_month' },
   { path: '/checks', label: '冲突与评论', icon: 'rule' },
   { path: '/review', label: '多角色会签', icon: 'fact_check' }
 ];
@@ -300,6 +302,8 @@ onBeforeUnmount(() => {
             <q-btn class="save-step" color="primary" no-caps icon="save" label="保存步骤修改" @click="store.updateStep({})" />
           </aside>
         </section>
+
+        <ScheduleView v-if="route.path === '/schedule'" />
 
         <section v-if="route.path === '/checks'" class="content-panel full-panel">
           <div class="panel-heading">
